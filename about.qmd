@@ -2,4 +2,16 @@
 title: "About"
 ---
 
-About this site
+About this site and me 
+
+# Me
+
+This is about me 
+
+# Project
+
+These are projects
+
+## Project 1
+
+This is project 1 

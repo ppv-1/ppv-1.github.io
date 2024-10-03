@@ -1,16 +1,30 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "github page",
+    "objectID": "project.html",
+    "href": "project.html",
+    "title": "Project",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+    "text": "My Projects\nHere are some of my projects:\n\nProject 1: Description of project 1.\nProject 2: Description of project 2."
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site"
+    "text": "About this site and me"
+  },
+  {
+    "objectID": "about.html#project-1",
+    "href": "about.html#project-1",
+    "title": "About",
+    "section": "Project 1",
+    "text": "Project 1\nThis is project 1"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "IntroWebpage",
+    "section": "",
+    "text": "Hello I’m Marcus\nI am currently a 2nd year student at Singapore Management Univeresity (SMU), pursuing a degree in Computer Science."
   }
 ]
