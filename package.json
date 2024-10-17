@@ -2,7 +2,7 @@
   "name": "my-github-page",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ppv-1.github.io",
+  "homepage": ".",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -12,6 +12,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "lucide-react": "^0.453.0",
+    "my-github-page": "file:",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
@@ -20,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && del /q docs\\* && move build\\* docs\\",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
@@ -46,7 +47,8 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
-    "gh-pages": "^6.1.1",
+    "gh-pages": "^6.2.0",
+    "mv-cli": "^0.0.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14"
   }
