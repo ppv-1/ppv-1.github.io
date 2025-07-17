@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Parallax, ParallaxLayer } from '@react-spring/parallax';
+import { Canvas } from '@react-three/fiber';
+import { Model } from './components/IcebergModel';
+import { OrbitControls } from '@react-three/drei';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Parallax pages={2}>
+      <ParallaxLayer offset={0} speed={0.5}>
+        <Canvas 
+          camera={{ 
+            position: [5, 3, 8], 
+            fov: 75 
+          }}
+          style={{ width: '100vw', height: '100vh' }}
+        >
+          {/* Essential lighting to see model colors */}
+          <ambientLight intensity={0.4} />
+          <directionalLight 
+            position={[10, 10, 5]} 
+            intensity={0.8}
+            castShadow
+          />
+          <pointLight position={[-10, -10, -10]} intensity={0.3} />
+          
+          {/* Add controls to navigate around the model */}
+          <OrbitControls 
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+            target={[0, 0, 0]}
+            minDistance={2}
+            maxDistance={20}
+          />
+          
+          <Model />
+        </Canvas>
+      </ParallaxLayer>
+
+      
+    </Parallax>
+  );
 }
 
-export default App
+export default App;
