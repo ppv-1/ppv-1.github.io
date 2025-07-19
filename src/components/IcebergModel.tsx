@@ -11,6 +11,7 @@ import * as THREE from 'three'
 import React from 'react'
 import type { JSX } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { useFrame, useThree } from '@react-three/fiber'
 import type { GLTF } from 'three-stdlib'
 
 type ActionName = 'Iceberg|CylinderAction.001' | 'Iceberg|IcebergAction.002' | 'Small Platform|CylinderAction.001' | 'Small Platform|IcebergAction.002'
@@ -48,10 +49,60 @@ type GLTFResult = GLTF & {
   animations: GLTFAction[]
 }
 
-export function Model(props: JSX.IntrinsicElements['group']) {
+interface ModelProps {
+  scroll: React.RefObject<{ current: number }>
+}
+
+export function Model({ scroll, ...props }: ModelProps & any) {
   const group = React.useRef<THREE.Group>(null)
   const { nodes, materials } = useGLTF('/models/iceberg.glb') as unknown as GLTFResult
-  // const { actions } = useAnimations(animations, group)
+  const { camera } = useThree()
+  
+  // Define camera path points based on scroll progress
+  const getCameraPosition = (progress: number) => {
+    // Define different camera positions for different scroll values
+    const cameraPositions = [
+      { position: [8, 5, 10], target: [0, 0, 0] },    // Start: Front view
+      { position: [12, 8, 0], target: [0, 0, 0] },    // Right side view
+      { position: [0, 12, 8], target: [0, 0, 0] },    // Top-back view
+      { position: [-8, 4, 5], target: [0, 0, 0] },    // Left side view
+      { position: [0, 20, 0], target: [0, 0, 0] }     // High overhead view
+    ];
+    
+    // Calculate which segment we're in based on scroll progress
+    const segment = Math.min(Math.floor(progress * (cameraPositions.length - 1)), cameraPositions.length - 2);
+    const localProgress = (progress * (cameraPositions.length - 1)) - segment;
+    
+    // Interpolate between current and next positions
+    const current = cameraPositions[segment];
+    const next = cameraPositions[segment + 1];
+    
+    return {
+      position: [
+        THREE.MathUtils.lerp(current.position[0], next.position[0], localProgress),
+        THREE.MathUtils.lerp(current.position[1], next.position[1], localProgress),
+        THREE.MathUtils.lerp(current.position[2], next.position[2], localProgress)
+      ] as [number, number, number],
+      target: [
+        THREE.MathUtils.lerp(current.target[0], next.target[0], localProgress),
+        THREE.MathUtils.lerp(current.target[1], next.target[1], localProgress),
+        THREE.MathUtils.lerp(current.target[2], next.target[2], localProgress)
+      ] as [number, number, number]
+    };
+  };
+  
+  // Update camera position on each frame based on scroll value
+  useFrame(() => {
+    if (scroll.current) {
+      const scrollProgress = scroll.current.current;
+      const { position, target } = getCameraPosition(scrollProgress);
+      
+      // Smoothly move camera to new position
+      camera.position.lerp(new THREE.Vector3(position[0], position[1], position[2]), 0.1);
+      camera.lookAt(new THREE.Vector3(target[0], target[1], target[2]));
+    }
+  });
+
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Sketchfab_Scene">
