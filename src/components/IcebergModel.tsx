@@ -55,18 +55,31 @@ interface ModelProps {
 
 export function Model({ scroll, ...props }: ModelProps & any) {
   const group = React.useRef<THREE.Group>(null)
+  const oceanRef = React.useRef<THREE.Mesh>(null)
   const { nodes, materials } = useGLTF('/models/iceberg.glb') as unknown as GLTFResult
   const { camera } = useThree()
   
+  // Create infinite ocean material
+  const oceanMaterial = React.useMemo(() => {
+    const material = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(0x006994), // Ocean blue
+      transparent: true,
+      opacity: 0.8,
+      roughness: 0.1,
+      metalness: 0.1,
+    })
+    return material
+  }, [])
+
   // Define camera path points based on scroll progress
   const getCameraPosition = (progress: number) => {
-    // Define different camera positions for different scroll values
+    // Define 5 camera positions for 20% each
     const cameraPositions = [
-      { position: [8, 5, 10], target: [0, 0, 0] },    // Start: Front view
-      { position: [12, 8, 0], target: [0, 0, 0] },    // Right side view
-      { position: [0, 12, 8], target: [0, 0, 0] },    // Top-back view
-      { position: [-8, 4, 5], target: [0, 0, 0] },    // Left side view
-      { position: [0, 20, 0], target: [0, 0, 0] }     // High overhead view
+      { position: [3, 2, 2], target: [0, 8, 1.5], distance: 0.5 }, // intro view, staring at sky
+      { position: [3, 2, 2], target: [-2, -0.5, 1.5], distance: 0.5 }, // surface view
+      { position: [-1, 1, -5], target: [0, -1, 0], distance: 0.7 }, // surface view from different angle
+      { position: [1, -3, -5], target: [0, -1, 0], distance: 0.7 },     // Slightly underwater front view
+      { position: [4, -7, 2], target: [0, -2.5, 0.5], distance: 0.5 },     // Underwater front view
     ];
     
     // Calculate which segment we're in based on scroll progress
@@ -77,12 +90,16 @@ export function Model({ scroll, ...props }: ModelProps & any) {
     const current = cameraPositions[segment];
     const next = cameraPositions[segment + 1];
     
+    const distance = THREE.MathUtils.lerp(current.distance, next.distance, localProgress);
+    
+    const scaledPosition = [
+      THREE.MathUtils.lerp(current.position[0] * current.distance, next.position[0] * next.distance, localProgress),
+      THREE.MathUtils.lerp(current.position[1] * current.distance, next.position[1] * next.distance, localProgress),
+      THREE.MathUtils.lerp(current.position[2] * current.distance, next.position[2] * next.distance, localProgress)
+    ] as [number, number, number];
+    
     return {
-      position: [
-        THREE.MathUtils.lerp(current.position[0], next.position[0], localProgress),
-        THREE.MathUtils.lerp(current.position[1], next.position[1], localProgress),
-        THREE.MathUtils.lerp(current.position[2], next.position[2], localProgress)
-      ] as [number, number, number],
+      position: scaledPosition,
       target: [
         THREE.MathUtils.lerp(current.target[0], next.target[0], localProgress),
         THREE.MathUtils.lerp(current.target[1], next.target[1], localProgress),
@@ -91,7 +108,7 @@ export function Model({ scroll, ...props }: ModelProps & any) {
     };
   };
   
-  // Update camera position on each frame based on scroll value
+  // Update camera position and ocean following
   useFrame(() => {
     if (scroll.current) {
       const scrollProgress = scroll.current.current;
@@ -100,11 +117,28 @@ export function Model({ scroll, ...props }: ModelProps & any) {
       // Smoothly move camera to new position
       camera.position.lerp(new THREE.Vector3(position[0], position[1], position[2]), 0.1);
       camera.lookAt(new THREE.Vector3(target[0], target[1], target[2]));
+      
+      // Make ocean follow camera for infinite effect
+      if (oceanRef.current) {
+        oceanRef.current.position.x = camera.position.x;
+        oceanRef.current.position.z = camera.position.z;
+      }
     }
   });
 
   return (
     <group ref={group} {...props} dispose={null}>
+      {/* Infinite Ocean Plane */}
+      <mesh
+        ref={oceanRef}
+        position={[0, 0, 0]} // At sea level
+        rotation={[-Math.PI / 2, 0, 0]}
+        material={oceanMaterial}
+      >
+        <planeGeometry args={[1000, 1000, 100, 100]} />
+      </mesh>
+
+      {/* Original Iceberg Model - but hide the original water */}
       <group name="Sketchfab_Scene">
         <group name="Sketchfab_model" rotation={[-Math.PI / 2, 0, 0]}>
           <group name="e630e7fd7a8040388f27e4b33bfb0044fbx" rotation={[Math.PI / 2, 0, 0]} scale={0.01}>
@@ -116,6 +150,8 @@ export function Model({ scroll, ...props }: ModelProps & any) {
                 <group name="Small_Platform" rotation={[-Math.PI / 2, 0, 0]} scale={100}>
                   <mesh name="Small_Platform_Iceberg_0" geometry={nodes.Small_Platform_Iceberg_0.geometry} material={materials.Iceberg} />
                 </group>
+                
+                {/* All the icosphere groups remain the same */}
                 <group name="Icosphere" position={[330.588, -513.18, -354.134]} rotation={[-Math.PI / 2, 0, 0]} scale={[122.554, 122.554, 73.57]}>
                   <mesh name="Icosphere_Iceberg_0" geometry={nodes.Icosphere_Iceberg_0.geometry} material={materials.Iceberg} />
                 </group>
@@ -155,13 +191,16 @@ export function Model({ scroll, ...props }: ModelProps & any) {
                 <group name="Icosphere012" position={[-411.966, -485.087, 511.443]} rotation={[-1.038, 1.123, -1.472]} scale={-6.199}>
                   <mesh name="Icosphere012_Iceberg_0" geometry={nodes.Icosphere012_Iceberg_0.geometry} material={materials.Iceberg} />
                 </group>
+                
                 <group name="Floor" rotation={[-Math.PI / 2, 0, 0]} scale={100}>
                   <mesh name="Floor_Ground_0" geometry={nodes.Floor_Ground_0.geometry} material={materials.Ground} />
                   <mesh name="Floor_Ground_0_1" geometry={nodes.Floor_Ground_0_1.geometry} material={materials.Ground} />
                 </group>
-                <group name="Water" rotation={[-Math.PI / 2, 0, 0]} scale={100}>
+                
+                {/* Comment out or remove the original water to prevent conflicts */}
+                {/* <group name="Water" rotation={[-Math.PI / 2, 0, 0]} scale={100}>
                   <mesh name="Water_Water_0" geometry={nodes.Water_Water_0.geometry} material={materials.Water} />
-                </group>
+                </group> */}
               </group>
             </group>
           </group>
