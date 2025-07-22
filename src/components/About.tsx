@@ -15,10 +15,10 @@ const About = () => {
               <div className="flex-1 flex flex-col justify-between">
                 <div>
                   <p className="text-gray-300 mb-6 leading-relaxed text-lg font-light">
-                    As a Computer Science student with a passion for software engineering and innovative problem-solving, I thrive on creating meaningful digital experiences through collaborative development.
+                    As a Computer Science student passionate about software engineering, I specialize in building impactful digital solutions through collaborative problem-solving and clean code.
                   </p>
                   <p className="text-gray-300 mb-6 leading-relaxed text-lg font-light">
-                    I have done full-stack development using modern frameworks like React and Spring Boot, and I possess strong foundations in cloud technologies, validated by my AWS Solutions Architect certification.
+                    With hands-on experience in full-stack development (React/Spring Boot) and cloud architecture (AWS Certified Solutions Architect), I build scalable and efficient applications.
                   </p>
                 </div>
                 <div className="flex justify-center mt-auto">
