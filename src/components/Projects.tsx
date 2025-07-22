@@ -1,17 +1,9 @@
-import { Briefcase, ExternalLink } from 'lucide-react';
+import { Briefcase} from 'lucide-react';
 import { Github } from 'lucide-react';
 import {
   SiReact,
-  SiNodedotjs,
-  SiMongodb,
-  SiVuedotjs,
-  SiFirebase,
   SiSocketdotio,
-  SiPython,
-  SiD3Dotjs,
-  SiTypescript,
   SiTailwindcss,
-  SiVite,
   SiSpringboot,
   SiMysql,
   SiDocker,
